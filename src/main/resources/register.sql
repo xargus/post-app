@@ -1,4 +1,5 @@
 create table IF NOT EXISTS USER_INFO (
 	user_id VARCHAR(255) NOT NULL PRIMARY KEY,
-	oauth_platform VARCHAR(14) NOT NULL
+	oauth_platform VARCHAR(14) NOT NULL,
+	access_token VARCHAR(255) NOT NULL
 ) DEFAULT CHARSET=utf8;

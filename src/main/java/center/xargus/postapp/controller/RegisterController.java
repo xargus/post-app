@@ -3,13 +3,10 @@ package center.xargus.postapp.controller;
 
 import java.sql.SQLException;
 
-import javax.naming.spi.DirStateFactory.Result;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,8 +28,13 @@ public class RegisterController {
 	
 	@RequestMapping(value = "/api/register", method={RequestMethod.GET, RequestMethod.POST})
 	@ResponseBody
-	public String register(@RequestParam(value="userId") String userId, @RequestParam(value="oauthPlatform") String oauthPlatform) {
-		if (TextUtils.isEmpty(userId) || TextUtils.isEmpty(oauthPlatform)) {
+	public String register(
+			@RequestParam(value="userId") String userId, 
+			@RequestParam(value="oauthPlatform") String oauthPlatform,
+			@RequestParam(value= "accessToken") String accessToken) {
+		if (TextUtils.isEmpty(userId) || 
+				TextUtils.isEmpty(oauthPlatform) || 
+				TextUtils.isEmpty(accessToken)) {
 			RegisterResultModel model = new RegisterResultModel();
 			model.setResult(ResultConfig.INVALID_PARAMETER);
 			return new Gson().toJson(model);
@@ -40,7 +42,7 @@ public class RegisterController {
 		
 		String result = ResultConfig.SUCCESS;
 		try {
-			registerdao.insertUserInfo(userId, oauthPlatform);
+			registerdao.insertUserInfo(userId, oauthPlatform, accessToken);
 		} catch (DataIntegrityViolationException e) {
 			result = ResultConfig.DUPLICATED_KEY;
 		} catch (SQLException e) {
@@ -55,4 +57,6 @@ public class RegisterController {
 		model.setResult(result);
 		return new Gson().toJson(model);
 	}
+	
+	
 }

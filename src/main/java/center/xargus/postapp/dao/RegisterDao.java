@@ -28,8 +28,8 @@ public class RegisterDao {
         DatabasePopulatorUtils.execute(populator, dataSource);
     }
 	
-	public int insertUserInfo(String userId, String oauthPlatform) throws SQLException {
-		String quey = "insert into USER_INFO (user_id, oauth_platform) values(?,?)";
-		return jdbcTemplate.update(quey, userId, oauthPlatform);
+	public int insertUserInfo(String userId, String oauthPlatform, String accessToken) throws SQLException {
+		String quey = "insert into USER_INFO (user_id, oauth_platform, access_token) values(?,?,?)";
+		return jdbcTemplate.update(quey, userId, oauthPlatform, accessToken);
 	}
 }
