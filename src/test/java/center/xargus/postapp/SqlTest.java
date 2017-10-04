@@ -8,14 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import center.xargus.postapp.dao.RegisterDao;
+import center.xargus.postapp.auth.dao.AuthenticationDao;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/application-config.xml")
 public class SqlTest {
 	
 	@Autowired
-	private RegisterDao registerDao;
+	private AuthenticationDao registerDao;
 	
 	@Test
 	public void test() {
