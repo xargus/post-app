@@ -52,4 +52,9 @@ public class MemoDao {
         String query = "select * from MEMO where user_id = '" + userId + "'" +" limit " + start + ", " + limit;
         return jdbcTemplate.query(query, new BeanPropertyRowMapper(MemoModel.class));
     }
+
+    public String getUserId(int memoId) {
+        String query = "select user_id from MEMO where _id = " + memoId;
+        return jdbcTemplate.queryForObject(query, String.class);
+    }
 }

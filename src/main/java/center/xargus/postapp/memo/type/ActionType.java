@@ -13,8 +13,8 @@ import java.util.List;
 public enum ActionType {
     INSERT {
         @Override
-        public ApiResultModel doAction(MemoDao memoDao, String userId, int memoId, String content, int start, int limit) {
-            if (TextUtils.isEmpty(userId) || TextUtils.isEmpty(content)) {
+        public ApiResultModel doAction(MemoDao memoDao, String userId, int memoId, String content, Integer start, Integer limit) {
+            if (TextUtils.isEmpty(content)) {
                 MemoInsertResultModel model = new MemoInsertResultModel();
                 model.setResult(ResultConfig.INVALID_PARAMETER);
                 return model;
@@ -40,7 +40,7 @@ public enum ActionType {
         }
     }, UPDATE {
         @Override
-        public ApiResultModel doAction(MemoDao memoDao, String userId, int memoId, String content, int start, int limit) {
+        public ApiResultModel doAction(MemoDao memoDao, String userId, int memoId, String content, Integer start, Integer limit) {
             if (memoId == -1 || TextUtils.isEmpty(content)) {
                 MemoUpdateResultModel model = new MemoUpdateResultModel();
                 model.setResult(ResultConfig.INVALID_PARAMETER);
@@ -49,7 +49,11 @@ public enum ActionType {
 
             String result = ResultConfig.SUCCESS;
             try {
-                memoDao.update(memoId, content);
+                if (userId.equals(memoDao.getUserId(memoId))) {
+                    memoDao.update(memoId, content);
+                } else {
+                    result = ResultConfig.WRONG_APPROACH;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 result = ResultConfig.UNKNOWN_ERROR;
@@ -63,7 +67,7 @@ public enum ActionType {
         }
     }, DELETE {
         @Override
-        public ApiResultModel doAction(MemoDao memoDao, String userId, int memoId, String content, int start, int limit) {
+        public ApiResultModel doAction(MemoDao memoDao, String userId, int memoId, String content, Integer start, Integer limit) {
             if (memoId == -1) {
                 MemoDeleteResultModel model = new MemoDeleteResultModel();
                 model.setResult(ResultConfig.INVALID_PARAMETER);
@@ -72,7 +76,11 @@ public enum ActionType {
 
             String result = ResultConfig.SUCCESS;
             try {
-                memoDao.delete(memoId);
+                if (userId.equals(memoDao.getUserId(memoId))) {
+                    memoDao.delete(memoId);
+                } else {
+                    result = ResultConfig.WRONG_APPROACH;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 result = ResultConfig.UNKNOWN_ERROR;
@@ -86,21 +94,24 @@ public enum ActionType {
         }
     }, SELECT {
         @Override
-        public ApiResultModel doAction(MemoDao memoDao, String userId, int memoId, String content, int start, int limit) {
-            if (start == -1 || limit == -1) {
+        public ApiResultModel doAction(MemoDao memoDao, String userId, int memoId, String content, Integer start, Integer limit) {
+            if (start == null || limit == null) {
                 MemoSelectResultModel model = new MemoSelectResultModel();
                 model.setResult(ResultConfig.INVALID_PARAMETER);
                 return model;
             }
+
+            int startIndex = start;
+            int limitIndex = limit;
 
             List<MemoModel> memoModels = null;
             String result = ResultConfig.SUCCESS;
 
             try {
                 if (TextUtils.isEmpty(userId)) {
-                    memoModels = memoDao.select(start, limit);
+                    memoModels = memoDao.select(startIndex, limitIndex);
                 } else {
-                    memoModels = memoDao.select(userId, start, limit);
+                    memoModels = memoDao.select(userId, startIndex, limitIndex);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -125,7 +136,7 @@ public enum ActionType {
         return actionType;
     }
 
-    public abstract ApiResultModel doAction(MemoDao memoDao, String userId, int memoId, String content, int start, int limit);
+    public abstract ApiResultModel doAction(MemoDao memoDao, String userId, int memoId, String content, Integer start, Integer limit);
 
     public Logger log = Logger.getLogger(this.getClass());
 }
