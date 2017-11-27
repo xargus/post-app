@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpSession;
 
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:8080"})
+@CrossOrigin(origins = {"http://localhost:3000", "https://post.xargus.center"})
 @Controller
 public class AuthenticationController {
 	private Logger log = Logger.getLogger(this.getClass());
