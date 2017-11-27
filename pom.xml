@@ -97,7 +97,7 @@
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<path>myProject</path>
+					<path>post</path>
 				</configuration>
 			</plugin>
 		</plugins>
