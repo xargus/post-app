@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 public enum AuthType {
     GOOGLE {
         @Override
-        public boolean validateAccessToken(String accessToken, RestTemplate restTemplate) {
+        public boolean validateAccessToken(String userId, String accessToken, RestTemplate restTemplate) {
             //https://developers.google.com/identity/protocols/OAuth2UserAgent
             GoogleAuthModel model = new GoogleAuthModel();
             try {
@@ -19,7 +19,7 @@ public enum AuthType {
             }
 
             log.info(model.toString());
-            if (TextUtils.isEmpty(model.error) && !TextUtils.isEmpty(model.aud)) {
+            if (TextUtils.isEmpty(model.error) && !TextUtils.isEmpty(model.aud) && model.user_id.equals(userId)) {
                 return true;
             } else {
                 return false;
@@ -27,7 +27,7 @@ public enum AuthType {
         }
     };
 
-    public abstract boolean validateAccessToken(String accessToken, RestTemplate restTemplate);
+    public abstract boolean validateAccessToken(String userId, String accessToken, RestTemplate restTemplate);
 
     public Logger log = Logger.getLogger(this.getClass());
     private static final String GOOGLE_TOKEN_INFO_URL = "https://www.googleapis.com/oauth2/v3/tokeninfo";

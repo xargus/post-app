@@ -3,9 +3,7 @@ package center.xargus.postapp.auth.controller;
 
 import java.sql.SQLException;
 
-import center.xargus.postapp.auth.model.UserInfoModel;
 import center.xargus.postapp.auth.type.AuthType;
-import center.xargus.postapp.constants.SessionConfig;
 import center.xargus.postapp.model.ApiResultModel;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +48,7 @@ public class AuthenticationController {
 		
 		ApiResultModel model;
 		AuthType authType = AuthType.getType(oauthPlatform.toUpperCase());
-		if (authType.validateAccessToken(accessToken, restTemplate)) {
+		if (authType.validateAccessToken(userId, accessToken, restTemplate)) {
 			model = insert(userId, oauthPlatform, accessToken);
 		} else {
 			model = new RegisterResultModel();
@@ -64,8 +62,7 @@ public class AuthenticationController {
 	@ResponseBody
 	public String login(@RequestParam(value="userId") String userId,
 						@RequestParam(value="oauthPlatform") String oauthPlatform,
-						@RequestParam(value= "accessToken") String accessToken,
-						HttpSession session) {
+						@RequestParam(value= "accessToken") String accessToken) {
 		if (TextUtils.isEmpty(userId) ||
 				TextUtils.isEmpty(oauthPlatform) || AuthType.getType(oauthPlatform.toUpperCase()) == null ||
 				TextUtils.isEmpty(accessToken)) {
@@ -76,7 +73,7 @@ public class AuthenticationController {
 
 		ApiResultModel model;
 		AuthType authType = AuthType.getType(oauthPlatform.toUpperCase());
-		if (authType.validateAccessToken(accessToken, restTemplate)) {
+		if (authType.validateAccessToken(userId, accessToken, restTemplate)) {
 			try {
 				updateAccessTokenIfNecessary(userId, accessToken);
 			} catch (EmptyResultDataAccessException e) {
@@ -85,7 +82,6 @@ public class AuthenticationController {
 				return new Gson().toJson(model);
 			}
 
-			makeSession(session, userId, oauthPlatform, accessToken);
 			model = new RegisterResultModel();
 			model.setResult(ResultConfig.SUCCESS);
 		} else {
@@ -127,14 +123,5 @@ public class AuthenticationController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void makeSession(HttpSession session, String userId, String oauth, String accessToken) {
-		UserInfoModel model = new UserInfoModel();
-		model.setAccessToken(accessToken);
-		model.setOauthPlatform(oauth);
-		model.setUserId(userId);
-
-		session.setAttribute(SessionConfig.LOGIN_USER_INFO_SESSION, model);
 	}
 }

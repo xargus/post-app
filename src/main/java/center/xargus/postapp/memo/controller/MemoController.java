@@ -1,8 +1,6 @@
 package center.xargus.postapp.memo.controller;
 
-import center.xargus.postapp.auth.model.UserInfoModel;
 import center.xargus.postapp.constants.ResultConfig;
-import center.xargus.postapp.constants.SessionConfig;
 import center.xargus.postapp.memo.dao.MemoDao;
 import center.xargus.postapp.memo.type.ActionType;
 import center.xargus.postapp.model.ApiResultModel;
@@ -12,8 +10,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
 
 @CrossOrigin(origins = {"http://localhost:3000", "https://post.xargus.center"})
 @Controller
@@ -30,16 +26,11 @@ public class MemoController {
                        @RequestParam(value = "content", required = false) String content,
                        @RequestParam(value = "start", required = false) Integer start,
                        @RequestParam(value = "limit", required = false) Integer limit,
-                       HttpSession session) {
-        if (TextUtils.isEmpty(action) || ActionType.getType(action.toUpperCase()) == null) {
+                       @RequestParam(value = "userId") String userId,
+                       @RequestParam(value = "accessToken") String accessToken) {
+        if (TextUtils.isEmpty(action) || ActionType.getType(action.toUpperCase()) == null || TextUtils.isEmpty(userId)) {
             ApiResultModel model = new ApiResultModel();
             model.setResult(ResultConfig.INVALID_PARAMETER);
-            return new Gson().toJson(model);
-        }
-
-        if (session == null && session.getAttribute(SessionConfig.LOGIN_USER_INFO_SESSION) == null) {
-            ApiResultModel model = new ApiResultModel();
-            model.setResult(ResultConfig.WRONG_APPROACH);
             return new Gson().toJson(model);
         }
 
@@ -50,7 +41,6 @@ public class MemoController {
             id = memoId;
         }
 
-        String userId = ((UserInfoModel) session.getAttribute(SessionConfig.LOGIN_USER_INFO_SESSION)).getUserId();
         log.info("action : " + action + ", type : " + ActionType.getType(action.toUpperCase()) + ", userId : " + userId);
 
         ApiResultModel model = ActionType.getType(action.toUpperCase()).doAction(memoDao, userId, id, content, start, limit);
