@@ -12,14 +12,14 @@ public enum AuthType {
             //https://developers.google.com/identity/protocols/OAuth2UserAgent
             GoogleAuthModel model = new GoogleAuthModel();
             try {
-                model = restTemplate.getForObject(GOOGLE_TOKEN_INFO_URL + "?access_token=" + accessToken, GoogleAuthModel.class);
+                model = restTemplate.getForObject(GOOGLE_USER_INFO_URL + "?access_token=" + accessToken, GoogleAuthModel.class);
             } catch (Exception e) {
                 e.printStackTrace();
                 model.error = e.getMessage();
             }
 
             log.info(model.toString());
-            if (TextUtils.isEmpty(model.error) && !TextUtils.isEmpty(model.aud) && model.user_id.equals(userId)) {
+            if (TextUtils.isEmpty(model.error) && !TextUtils.isEmpty(model.sub) && model.sub.equals(userId)) {
                 return true;
             } else {
                 return false;
@@ -30,7 +30,7 @@ public enum AuthType {
     public abstract boolean validateAccessToken(String userId, String accessToken, RestTemplate restTemplate);
 
     public Logger log = Logger.getLogger(this.getClass());
-    private static final String GOOGLE_TOKEN_INFO_URL = "https://www.googleapis.com/oauth2/v3/tokeninfo";
+    private static final String GOOGLE_USER_INFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
 
     public static AuthType getType(String type) {
         AuthType authType = null;

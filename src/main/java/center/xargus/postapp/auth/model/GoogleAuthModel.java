@@ -2,19 +2,23 @@ package center.xargus.postapp.auth.model;
 
 public class GoogleAuthModel {
     public String error;
-    public String aud;
-    public String user_id;
-    public String scope;
-    public String expires_in;
+    public String sub;
+    public String name;
+    public String email;
+    public String picture;
+    public String locale;
+    public boolean email_verified;
 
     @Override
     public String toString() {
         return "GoogleAuthModel{" +
                 "error='" + error + '\'' +
-                ", aud='" + aud + '\'' +
-                ", user_id='" + user_id + '\'' +
-                ", scope='" + scope + '\'' +
-                ", expires_in='" + expires_in + '\'' +
+                ", sub='" + sub + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", picture='" + picture + '\'' +
+                ", locale='" + locale + '\'' +
+                ", email_verified=" + email_verified +
                 '}';
     }
 }

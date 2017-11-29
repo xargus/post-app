@@ -47,12 +47,12 @@ public class MemoController {
         return new Gson().toJson(model);
     }
 
-    @RequestMapping(value = "/api/memoAll", method={RequestMethod.GET, RequestMethod.POST})
-    @ResponseBody
-    public String memoAll(@RequestParam(value = "start", required = false) Integer start,
-                          @RequestParam(value = "limit", required = false) Integer limit) {
-
-        ApiResultModel model = ActionType.SELECT.doAction(memoDao, null, -1, null, start, limit);
-        return new Gson().toJson(model);
-    }
+//    @RequestMapping(value = "/api/memoAll", method={RequestMethod.GET, RequestMethod.POST})
+//    @ResponseBody
+//    public String memoAll(@RequestParam(value = "start", required = false) Integer start,
+//                          @RequestParam(value = "limit", required = false) Integer limit) {
+//
+//        ApiResultModel model = ActionType.SELECT.doAction(memoDao, null, -1, null, start, limit);
+//        return new Gson().toJson(model);
+//    }
 }
