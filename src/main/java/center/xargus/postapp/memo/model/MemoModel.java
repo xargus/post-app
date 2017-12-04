@@ -4,6 +4,7 @@ public class MemoModel {
     private int _id;
     private String userId;
     private String content;
+    private String updateDate;
 
     public int get_id() {
         return _id;
@@ -27,5 +28,13 @@ public class MemoModel {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
     }
 }

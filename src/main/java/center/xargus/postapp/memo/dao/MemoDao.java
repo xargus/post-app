@@ -28,14 +28,14 @@ public class MemoDao {
         DatabasePopulatorUtils.execute(databasePopulator, dataSource);
     }
 
-    public int insert(String userId, String content) {
-        String query = "insert into MEMO (user_id, content) VALUES(?, ?)";
-        return jdbcTemplate.update(query, userId, content);
+    public int insert(String userId, String content, String updateDate) {
+        String query = "insert into MEMO (user_id, content, updateDate) VALUES(?, ?, ?)";
+        return jdbcTemplate.update(query, userId, content, updateDate);
     }
 
-    public int update(int memoId, String content) {
-        String query = "update MEMO set content = ? where _id = ?";
-        return jdbcTemplate.update(query, content, memoId);
+    public int update(int memoId, String content, String updateDate) {
+        String query = "update MEMO set content = ?, updateDate = ? where _id = ?";
+        return jdbcTemplate.update(query, content, updateDate, memoId);
     }
 
     public int delete(int memoId) {
@@ -44,12 +44,12 @@ public class MemoDao {
     }
 
     public List<MemoModel> select(int start, int limit) {
-        String query = "select * from MEMO limit " + start + ", " + limit;
+        String query = "select * from MEMO ORDER BY updateDate DESC limit " + start + ", " + limit;
         return jdbcTemplate.query(query, new BeanPropertyRowMapper(MemoModel.class));
     }
 
     public List<MemoModel> select(String userId, int start, int limit) {
-        String query = "select * from MEMO where user_id = '" + userId + "'" +" limit " + start + ", " + limit;
+        String query = "select * from MEMO where user_id = '" + userId + "'" +" ORDER BY updateDate DESC limit " + start + ", " + limit;
         return jdbcTemplate.query(query, new BeanPropertyRowMapper(MemoModel.class));
     }
 

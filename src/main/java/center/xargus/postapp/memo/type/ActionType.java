@@ -8,6 +8,9 @@ import center.xargus.postapp.utils.TextUtils;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public enum ActionType {
@@ -22,7 +25,11 @@ public enum ActionType {
 
             String result = ResultConfig.SUCCESS;
             try {
-                memoDao.insert(userId, content);
+                Date d = new Date();
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String currentTime = df.format(d);
+
+                memoDao.insert(userId, content, currentTime);
             } catch (DataIntegrityViolationException e) {
                 e.printStackTrace();
                 result = ResultConfig.INVALID_ID;
@@ -50,7 +57,11 @@ public enum ActionType {
             String result = ResultConfig.SUCCESS;
             try {
                 if (userId.equals(memoDao.getUserId(memoId))) {
-                    memoDao.update(memoId, content);
+                    Date d = new Date();
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String currentTime = df.format(d);
+
+                    memoDao.update(memoId, content, currentTime);
                 } else {
                     result = ResultConfig.WRONG_APPROACH;
                 }
