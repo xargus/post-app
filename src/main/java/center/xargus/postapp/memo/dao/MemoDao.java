@@ -53,6 +53,11 @@ public class MemoDao {
         return jdbcTemplate.query(query, new BeanPropertyRowMapper(MemoModel.class));
     }
 
+    public Integer lastInsertId() {
+        String query = "SELECT LAST_INSERT_ID();";
+        return jdbcTemplate.queryForObject(query, Integer.class);
+    }
+
     public String getUserId(int memoId) {
         String query = "select user_id from MEMO where _id = " + memoId;
         return jdbcTemplate.queryForObject(query, String.class);
