@@ -152,15 +152,20 @@ public enum ActionType {
             }
 
             String result = ResultConfig.SUCCESS;
+            List<MemoModel> models = null;
             try {
-                elasticsearchRepository.searchMemo(userId, content);
+                List<String> ids = elasticsearchRepository.searchMemo(userId, content);
+                if (ids != null && ids.size() > 0) {
+                    models = memoDao.select(ids);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 result = ResultConfig.UNKNOWN_ERROR;
             }
 
-            MemoInsertResultModel model = new MemoInsertResultModel();
+            MemoSelectResultModel model = new MemoSelectResultModel();
             model.setResult(result);
+            model.setMemoList(models);
             return model;
         }
     };

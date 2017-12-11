@@ -53,6 +53,20 @@ public class MemoDao {
         return jdbcTemplate.query(query, new BeanPropertyRowMapper(MemoModel.class));
     }
 
+    public List<MemoModel> select(List<String> ids) {
+        StringBuilder builder = new StringBuilder("select * from MEMO where");
+        for (int i =0 ;i< ids.size(); i++) {
+            builder.append(" _id=");
+            builder.append(ids.get(i));
+            if (i != ids.size() - 1) {
+                builder.append(" or");
+            }
+        }
+
+        String query = builder.toString();
+        return jdbcTemplate.query(query, new BeanPropertyRowMapper(MemoModel.class));
+    }
+
     public Integer lastInsertId() {
         String query = "SELECT LAST_INSERT_ID();";
         return jdbcTemplate.queryForObject(query, Integer.class);

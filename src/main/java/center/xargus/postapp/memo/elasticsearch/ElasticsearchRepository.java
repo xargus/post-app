@@ -1,12 +1,17 @@
 package center.xargus.postapp.memo.elasticsearch;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ElasticsearchRepository {
@@ -41,17 +46,37 @@ public class ElasticsearchRepository {
 
         Response response = client.newCall(request).execute();
         String result = new String(response.body().bytes());
-        log.info("putMemo result : " + result);
+        log.info("deleteMemo result : " + result);
     }
 
-    public void searchMemo(String userId, String keyword) throws IOException {
+    public List<String> searchMemo(String userId, String keyword) throws IOException {
         Request request = new Request.Builder()
                 .url(URL + "/memo/" + userId + "/_search?q=content:*"+keyword+"*")
                 .build();
 
         Response response = client.newCall(request).execute();
         String result = new String(response.body().bytes());
-        log.info("putMemo result : " + result);
+        log.info("searchMemo result : " + result);
+
+        JsonObject jsonObject = new JsonParser().parse(result).getAsJsonObject().getAsJsonObject("hits");
+        JsonArray jsonArray = jsonObject.getAsJsonArray("hits");
+        List<String> ids = new ArrayList<>();
+        for (int i=0; i< jsonArray.size(); i++) {
+            String id = jsonArray.get(i).getAsJsonObject().getAsJsonPrimitive("_id").getAsString();
+            ids.add(id);
+        }
+
+        return ids;
+    }
+
+    private void cacheClear() throws IOException {
+        Request request = new Request.Builder()
+                .url(URL + "/memo/_cache/clear")
+                .build();
+
+        Response response = client.newCall(request).execute();
+        String result = new String(response.body().bytes());
+        log.info("cache clear result : " + result);
     }
 
     private class InsertMemoModel {
