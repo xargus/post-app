@@ -1,26 +1,22 @@
 package center.xargus.postapp.auth.controller;
 
 
-import java.sql.SQLException;
-
+import center.xargus.postapp.auth.dao.AuthenticationDao;
+import center.xargus.postapp.auth.model.RegisterResultModel;
 import center.xargus.postapp.auth.type.AuthType;
+import center.xargus.postapp.constants.ResultConfig;
 import center.xargus.postapp.model.ApiResultModel;
+import center.xargus.postapp.utils.TextUtils;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import com.google.gson.Gson;
-
-import center.xargus.postapp.constants.ResultConfig;
-import center.xargus.postapp.auth.dao.AuthenticationDao;
-import center.xargus.postapp.auth.model.RegisterResultModel;
-import center.xargus.postapp.utils.TextUtils;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpSession;
+import java.sql.SQLException;
 
 @CrossOrigin(origins = {"http://localhost:3000", "https://post.xargus.center"})
 @Controller
