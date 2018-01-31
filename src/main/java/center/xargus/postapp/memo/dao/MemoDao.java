@@ -1,79 +1,17 @@
 package center.xargus.postapp.memo.dao;
 
 import center.xargus.postapp.memo.model.MemoModel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Param;
 
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
 import java.util.List;
 
-@Repository
-public class MemoDao {
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private DataSource dataSource;
-
-    @PostConstruct
-    public void initialize() {
-        ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-        databasePopulator.addScript(new ClassPathResource("memo.sql"));
-        DatabasePopulatorUtils.execute(databasePopulator, dataSource);
-    }
-
-    public int insert(String userId, String content, String updateDate) {
-        String query = "insert into MEMO (user_id, content, updateDate) VALUES(?, ?, ?)";
-        return jdbcTemplate.update(query, userId, content, updateDate);
-    }
-
-    public int update(int memoId, String content, String updateDate) {
-        String query = "update MEMO set content = ?, updateDate = ? where _id = ?";
-        return jdbcTemplate.update(query, content, updateDate, memoId);
-    }
-
-    public int delete(int memoId) {
-        String query = "delete from MEMO where _id = ?";
-        return jdbcTemplate.update(query, memoId);
-    }
-
-    public List<MemoModel> select(int start, int limit) {
-        String query = "select * from MEMO ORDER BY updateDate DESC limit " + start + ", " + limit;
-        return jdbcTemplate.query(query, new BeanPropertyRowMapper(MemoModel.class));
-    }
-
-    public List<MemoModel> select(String userId, int start, int limit) {
-        String query = "select * from MEMO where user_id = '" + userId + "'" +" ORDER BY updateDate DESC limit " + start + ", " + limit;
-        return jdbcTemplate.query(query, new BeanPropertyRowMapper(MemoModel.class));
-    }
-
-    public List<MemoModel> select(List<String> ids) {
-        StringBuilder builder = new StringBuilder("select * from MEMO where");
-        for (int i =0 ;i< ids.size(); i++) {
-            builder.append(" _id=");
-            builder.append(ids.get(i));
-            if (i != ids.size() - 1) {
-                builder.append(" or");
-            }
-        }
-
-        String query = builder.toString();
-        return jdbcTemplate.query(query, new BeanPropertyRowMapper(MemoModel.class));
-    }
-
-    public Integer lastInsertId() {
-        String query = "SELECT LAST_INSERT_ID();";
-        return jdbcTemplate.queryForObject(query, Integer.class);
-    }
-
-    public String getUserId(int memoId) {
-        String query = "select user_id from MEMO where _id = " + memoId;
-        return jdbcTemplate.queryForObject(query, String.class);
-    }
+public interface MemoDao {
+    void insert(@Param("user_id") String userId, @Param("content") String content, @Param("updateDate") String updateDate);
+    void update(@Param("_id") int memoId, @Param("content") String content, @Param("updateDate") String updateDate);
+    void delete(@Param("_id") int memoId);
+    List<MemoModel> select(@Param("start") int start, @Param("limit") int limit);
+    List<MemoModel> selectWithUserId(@Param("user_id") String userId, @Param("start") int start, @Param("limit") int limit);
+    List<MemoModel> selectWithIds(@Param("ids") List<String> ids);
+    int lastInsertId();
+    String getUserId(@Param("_id") int memoId);
 }

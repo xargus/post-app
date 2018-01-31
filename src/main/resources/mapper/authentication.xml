@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="center.xargus.postapp.auth.dao.AuthenticationDao">
+    <select id="insertUserInfo" parameterType="String">
+        insert into USER_INFO (user_id, oauth_platform, access_token) values(#{user_id}, #{oauth_platform}, #{access_token})
+    </select>
+
+    <select id="queryAccessToken" parameterType="String" resultType="string">
+        select access_token from USER_INFO where user_id = #{user_id}
+    </select>
+
+    <select id="updateAccessToken" parameterType="String">
+        update USER_INFO set access_token = #{access_token} where user_id = #{user_id}
+    </select>
+
+    <select id="queryUserInfo" parameterType="String" resultType="center.xargus.postapp.auth.model.UserInfoModel">
+        select * from USER_INFO where user_id = #{user_id}
+    </select>
+</mapper>

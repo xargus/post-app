@@ -2,7 +2,7 @@ package center.xargus.postapp.memo.model;
 
 public class MemoModel {
     private int _id;
-    private String userId;
+    private String user_id;
     private String content;
     private String updateDate;
 
@@ -15,11 +15,11 @@ public class MemoModel {
     }
 
     public String getUserId() {
-        return userId;
+        return user_id;
     }
 
     public void setUserId(String userId) {
-        this.userId = userId;
+        this.user_id = userId;
     }
 
     public String getContent() {

@@ -7,11 +7,17 @@ import center.xargus.postapp.memo.type.ActionType;
 import center.xargus.postapp.model.ApiResultModel;
 import center.xargus.postapp.utils.TextUtils;
 import com.google.gson.Gson;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 import java.util.concurrent.Callable;
 
 @CrossOrigin(origins = {"http://localhost:3000", "https://post.xargus.center"})
@@ -20,10 +26,20 @@ public class MemoController {
     private Logger log = Logger.getLogger(this.getClass());
 
     @Autowired
-    private MemoDao memoDao;
+    private SqlSession sqlSession;
 
     @Autowired
     private ElasticsearchRepository elasticsearchRepository;
+
+    @Autowired
+    private DataSource dataSource;
+
+    @PostConstruct
+    public void initialize() {
+        ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+        databasePopulator.addScript(new ClassPathResource("memo.sql"));
+        DatabasePopulatorUtils.execute(databasePopulator, dataSource);
+    }
 
     @RequestMapping(value = "/api/memo", method={RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -52,7 +68,7 @@ public class MemoController {
 
                 log.info("action : " + action + ", type : " + ActionType.getType(action.toUpperCase()) + ", userId : " + userId);
 
-                ApiResultModel model = ActionType.getType(action.toUpperCase()).doAction(memoDao, elasticsearchRepository, userId, id, content, start, limit);
+                ApiResultModel model = ActionType.getType(action.toUpperCase()).doAction(sqlSession.getMapper(MemoDao.class), elasticsearchRepository, userId, id, content, start, limit);
                 return new Gson().toJson(model);
             }
         };

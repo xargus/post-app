@@ -8,26 +8,42 @@ import center.xargus.postapp.constants.ResultConfig;
 import center.xargus.postapp.model.ApiResultModel;
 import center.xargus.postapp.utils.TextUtils;
 import com.google.gson.Gson;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 import java.sql.SQLException;
 
 @CrossOrigin(origins = {"http://localhost:3000", "https://post.xargus.center"})
 @Controller
 public class AuthenticationController {
 	private Logger log = Logger.getLogger(this.getClass());
-	
+
 	@Autowired
-	private AuthenticationDao authDao;
+	private SqlSession sqlSession;
 
 	@Autowired
 	private RestTemplate restTemplate;
+
+	@Autowired
+	private DataSource dataSource;
+
+	@PostConstruct
+	public void initialize(){
+		ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+		populator.addScript(new ClassPathResource("user_info.sql"));
+		DatabasePopulatorUtils.execute(populator, dataSource);
+	}
 	
 	@RequestMapping(value = "/api/auth/register", method={RequestMethod.GET, RequestMethod.POST})
 	@ResponseBody
@@ -41,7 +57,7 @@ public class AuthenticationController {
 			model.setResult(ResultConfig.INVALID_PARAMETER);
 			return new Gson().toJson(model);
 		}
-		
+
 		ApiResultModel model;
 		AuthType authType = AuthType.getType(oauthPlatform.toUpperCase());
 		if (authType.validateAccessToken(userId, accessToken, restTemplate)) {
@@ -91,10 +107,11 @@ public class AuthenticationController {
 	private ApiResultModel insert(String userId, String oauthPlatform, String accessToken) {
 		String result = ResultConfig.SUCCESS;
 		try {
-			authDao.insertUserInfo(userId, oauthPlatform, accessToken);
+			AuthenticationDao authenticationDao = sqlSession.getMapper(AuthenticationDao.class);
+			authenticationDao.insertUserInfo(userId, oauthPlatform, accessToken);
 		} catch (DataIntegrityViolationException e) {
 			result = ResultConfig.DUPLICATED_KEY;
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			log.error(e.getMessage());
 			result = ResultConfig.UNKNOWN_ERROR;
@@ -110,9 +127,10 @@ public class AuthenticationController {
 
 	private void updateAccessTokenIfNecessary(String userId, String newAccessToken) throws EmptyResultDataAccessException {
 		try {
-			String accessToken = authDao.queryAccessToken(userId);
+			AuthenticationDao authenticationDao = sqlSession.getMapper(AuthenticationDao.class);
+			String accessToken = authenticationDao.queryAccessToken(userId);
 			if (!newAccessToken.equals(accessToken)) {
-				authDao.updateAccessToken(userId, newAccessToken);
+				authenticationDao.updateAccessToken(userId, newAccessToken);
 			}
 		} catch (EmptyResultDataAccessException e) {
 			throw e;

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="center.xargus.postapp.memo.dao.MemoDao">
+
+    <select id="insert" parameterType="String">
+        insert into MEMO (user_id, content, updateDate) VALUES(#{user_id}, #{content}, #{updateDate})
+    </select>
+    
+    <select id="update">
+        update MEMO set content = #{content}, updateDate = #{updateDate} where _id = #{_id}
+    </select>
+    
+    <select id="delete" parameterType="int">
+        delete from MEMO where _id = #{_id}
+    </select>
+    
+    <select id="select" parameterType="int" resultType="center.xargus.postapp.memo.model.MemoModel">
+        select * from MEMO ORDER BY updateDate DESC limit #{start}, #{limit}
+    </select>
+
+    <select id="selectWithUserId" resultType="center.xargus.postapp.memo.model.MemoModel">
+        select * from MEMO where user_id = #{user_id} ORDER BY updateDate DESC limit #{start}, #{limit}
+    </select>
+
+    <select id="selectWithIds" parameterType="java.util.List" resultType="center.xargus.postapp.memo.model.MemoModel">
+        select * from MEMO where
+        <foreach collection="ids" item="id" separator="or">
+            _id = #{id}
+        </foreach>
+    </select>
+
+    <select id="lastInsertId" resultType="int">
+        SELECT LAST_INSERT_ID()
+    </select>
+
+    <select id="getUserId" parameterType="int" resultType="String">
+        select user_id from MEMO where _id = #{_id}
+    </select>
+</mapper>

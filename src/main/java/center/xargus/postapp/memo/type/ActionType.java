@@ -32,9 +32,9 @@ public enum ActionType {
                 String currentTime = df.format(d);
 
                 memoDao.insert(userId, content, currentTime);
-                Integer id = memoDao.lastInsertId();
+                int id = memoDao.lastInsertId();
 
-                elasticsearchRepository.putMemo(id.intValue(), userId, content);
+                elasticsearchRepository.putMemo(id, userId, content);
             } catch (DataIntegrityViolationException e) {
                 e.printStackTrace();
                 result = ResultConfig.INVALID_ID;
@@ -96,6 +96,7 @@ public enum ActionType {
             try {
                 if (userId.equals(memoDao.getUserId(memoId))) {
                     memoDao.delete(memoId);
+
                     elasticsearchRepository.deleteMemo(memoId, userId);
                 } else {
                     result = ResultConfig.WRONG_APPROACH;
@@ -130,7 +131,7 @@ public enum ActionType {
                 if (TextUtils.isEmpty(userId)) {
                     memoModels = memoDao.select(startIndex, limitIndex);
                 } else {
-                    memoModels = memoDao.select(userId, startIndex, limitIndex);
+                    memoModels = memoDao.selectWithUserId(userId, startIndex, limitIndex);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -156,7 +157,7 @@ public enum ActionType {
             try {
                 List<String> ids = elasticsearchRepository.searchMemo(userId, content);
                 if (ids != null && ids.size() > 0) {
-                    models = memoDao.select(ids);
+                    models = memoDao.selectWithIds(ids);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

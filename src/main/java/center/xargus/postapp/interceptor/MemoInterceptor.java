@@ -7,11 +7,13 @@ import center.xargus.postapp.constants.ResultConfig;
 import center.xargus.postapp.model.ApiResultModel;
 import center.xargus.postapp.utils.TextUtils;
 import com.google.gson.Gson;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,10 +21,10 @@ public class MemoInterceptor extends HandlerInterceptorAdapter{
     private Logger log = Logger.getLogger(this.getClass());
 
     @Autowired
-    private AuthenticationDao authDao;
+    private RestTemplate restTemplate;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private SqlSession sqlSession;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -37,7 +39,9 @@ public class MemoInterceptor extends HandlerInterceptorAdapter{
             return false;
         }
 
-        UserInfoModel userInfoModel = authDao.queryUserInfo(userId);
+        AuthenticationDao authenticationDao = sqlSession.getMapper(AuthenticationDao.class);
+
+        UserInfoModel userInfoModel = authenticationDao.queryUserInfo(userId);
         if (userInfoModel == null) {
             ApiResultModel model = new ApiResultModel();
             model.setResult(ResultConfig.WRONG_APPROACH);
@@ -47,7 +51,7 @@ public class MemoInterceptor extends HandlerInterceptorAdapter{
 
         if (!userInfoModel.getAccessToken().equals(accessToken)) {
             if (AuthType.getType(userInfoModel.getOauthPlatform().toUpperCase()).validateAccessToken(userId, accessToken, restTemplate)) {
-                authDao.updateAccessToken(userId, accessToken);
+                authenticationDao.updateAccessToken(userId, accessToken);
             } else {
                 ApiResultModel model = new ApiResultModel();
                 model.setResult(ResultConfig.WRONG_APPROACH);
