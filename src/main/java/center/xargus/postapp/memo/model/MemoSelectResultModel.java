@@ -6,6 +6,7 @@ import java.util.List;
 
 public class MemoSelectResultModel extends ApiResultModel {
     private List<MemoModel> memoList;
+    private int totalLength;
 
     public List<MemoModel> getMemoList() {
         return memoList;
@@ -13,5 +14,13 @@ public class MemoSelectResultModel extends ApiResultModel {
 
     public void setMemoList(List<MemoModel> memoList) {
         this.memoList = memoList;
+    }
+
+    public int getTotalLength() {
+        return totalLength;
+    }
+
+    public void setTotalLength(int totalLength) {
+        this.totalLength = totalLength;
     }
 }

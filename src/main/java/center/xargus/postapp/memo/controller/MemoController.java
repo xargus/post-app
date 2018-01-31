@@ -6,6 +6,7 @@ import center.xargus.postapp.memo.elasticsearch.ElasticsearchRepository;
 import center.xargus.postapp.memo.type.ActionType;
 import center.xargus.postapp.model.ApiResultModel;
 import center.xargus.postapp.utils.TextUtils;
+import center.xargus.postapp.utils.TimeFormatUtils;
 import com.google.gson.Gson;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
@@ -49,13 +50,20 @@ public class MemoController {
                                 @RequestParam(value = "start", required = false) final Integer start,
                                 @RequestParam(value = "limit", required = false) final Integer limit,
                                 @RequestParam(value = "userId") final String userId,
-                                @RequestParam(value = "accessToken") String accessToken) {
+                                @RequestParam(value = "accessToken") String accessToken,
+                                 @RequestParam(value = "time", required = false) final String time) {
         return new Callable<String>() {
             @Override
             public String call() throws Exception {
                 if (TextUtils.isEmpty(action) || ActionType.getType(action.toUpperCase()) == null || TextUtils.isEmpty(userId)) {
                     ApiResultModel model = new ApiResultModel();
                     model.setResult(ResultConfig.INVALID_PARAMETER);
+                    return new Gson().toJson(model);
+                }
+
+                if (!TextUtils.isEmpty(time) && !TimeFormatUtils.validateFormat(time, TimeFormatUtils.DATE_FORMAT)) {
+                    ApiResultModel model = new ApiResultModel();
+                    model.setResult(ResultConfig.INVALID_TIME_FORMAT);
                     return new Gson().toJson(model);
                 }
 
@@ -68,7 +76,7 @@ public class MemoController {
 
                 log.info("action : " + action + ", type : " + ActionType.getType(action.toUpperCase()) + ", userId : " + userId);
 
-                ApiResultModel model = ActionType.getType(action.toUpperCase()).doAction(sqlSession.getMapper(MemoDao.class), elasticsearchRepository, userId, id, content, start, limit);
+                ApiResultModel model = ActionType.getType(action.toUpperCase()).doAction(sqlSession.getMapper(MemoDao.class), elasticsearchRepository, userId, id, content, start, limit, time);
                 return new Gson().toJson(model);
             }
         };

@@ -4,5 +4,7 @@ create table IF NOT EXISTS MEMO (
 	content TEXT NOT NULL,
 	updateDate VARCHAR(50) NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES USER_INFO(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
-	index user_by (user_id)
+	index user_by (user_id),
+	index id_with_date (user_id, updateDate),
+	index update_date(updateDate)
 ) DEFAULT CHARSET=utf8;
