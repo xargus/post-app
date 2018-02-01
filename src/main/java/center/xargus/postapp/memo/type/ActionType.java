@@ -132,7 +132,7 @@ public enum ActionType {
                     memoModels = memoDao.selectWithUserId(userId, startIndex, limitIndex, time);
                 }
 
-                totalLength = memoDao.totalLength(userId);
+                totalLength = memoDao.totalLength(userId, time);
             } catch (Exception e) {
                 e.printStackTrace();
                 result = ResultConfig.UNKNOWN_ERROR;

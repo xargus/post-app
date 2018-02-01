@@ -11,7 +11,7 @@ public interface MemoDao {
     void delete(@Param("_id") int memoId);
     List<MemoModel> select(@Param("start") int start, @Param("limit") int limit, @Param("time") String time);
     List<MemoModel> selectWithUserId(@Param("user_id") String userId, @Param("start") int start, @Param("limit") int limit, @Param("time") String time);
-    int totalLength(@Param("user_id") String userId);
+    int totalLength(@Param("user_id") String userId, @Param("time") String time);
     List<MemoModel> selectWithIds(@Param("ids") List<String> ids);
     int lastInsertId();
     String getUserId(@Param("_id") int memoId);

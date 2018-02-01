@@ -39,6 +39,6 @@
     </select>
 
     <select id="totalLength" parameterType="String" resultType="int">
-        select count(*) from MEMO where user_id = #{user_id}
+        <![CDATA[select count(*) from MEMO where user_id = #{user_id} AND updateDate < #{time}]]>
     </select>
 </mapper>
