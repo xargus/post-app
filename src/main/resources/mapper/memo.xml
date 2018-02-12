@@ -4,11 +4,11 @@
 <mapper namespace="center.xargus.postapp.memo.dao.MemoDao">
 
     <select id="insert" parameterType="String">
-        insert into MEMO (user_id, content, updateDate) VALUES(#{user_id}, #{content}, #{updateDate})
+        insert into MEMO (user_id, title, content, updateDate) VALUES(#{user_id}, #{title}, #{content}, #{updateDate})
     </select>
     
     <select id="update">
-        update MEMO set content = #{content}, updateDate = #{updateDate} where _id = #{_id}
+        update MEMO set title = #{title}, content = #{content}, updateDate = #{updateDate} where _id = #{_id}
     </select>
     
     <select id="delete" parameterType="int">

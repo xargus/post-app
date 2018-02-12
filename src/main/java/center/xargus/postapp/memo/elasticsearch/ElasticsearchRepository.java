@@ -23,10 +23,10 @@ public class ElasticsearchRepository {
             .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .build();
 
-    public void putMemo(int memoId, String userId, String content) throws IOException {
+    public void putMemo(int memoId, String userId, String title, String content) throws IOException {
         RequestBody body = RequestBody
                 .create(MediaType.parse("application/json; charset=utf-8"),
-                new Gson().toJson(new InsertMemoModel(content)).toString());
+                new Gson().toJson(new InsertMemoModel(title, content)).toString());
 
         Request request = new Request.Builder()
                 .url(URL + "/memo/" + userId + "/" + String.valueOf(memoId))
@@ -80,9 +80,11 @@ public class ElasticsearchRepository {
     }
 
     private class InsertMemoModel {
+        public String title;
         public String content;
 
-        public InsertMemoModel(String content) {
+        public InsertMemoModel(String title, String content) {
+            this.title = title;
             this.content = content;
         }
     }

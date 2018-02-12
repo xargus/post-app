@@ -1,175 +1,30 @@
 package center.xargus.postapp.memo.type;
 
-import center.xargus.postapp.constants.ResultConfig;
-import center.xargus.postapp.memo.dao.MemoDao;
-import center.xargus.postapp.memo.elasticsearch.ElasticsearchRepository;
-import center.xargus.postapp.memo.model.*;
-import center.xargus.postapp.model.ApiResultModel;
-import center.xargus.postapp.utils.TextUtils;
-import center.xargus.postapp.utils.TimeFormatUtils;
-import org.apache.log4j.Logger;
-import org.springframework.dao.DataIntegrityViolationException;
-
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
 public enum ActionType {
     INSERT {
         @Override
-        public ApiResultModel doAction(MemoDao memoDao, ElasticsearchRepository elasticsearchRepository, String userId, int memoId, String content, Integer start, Integer limit, String time) {
-            if (TextUtils.isEmpty(content)) {
-                MemoInsertResultModel model = new MemoInsertResultModel();
-                model.setResult(ResultConfig.INVALID_PARAMETER);
-                return model;
-            }
-
-            String result = ResultConfig.SUCCESS;
-            try {
-                memoDao.insert(userId, content, TimeFormatUtils.getCurrentTime());
-                int id = memoDao.lastInsertId();
-
-                elasticsearchRepository.putMemo(id, userId, content);
-            } catch (DataIntegrityViolationException e) {
-                e.printStackTrace();
-                result = ResultConfig.INVALID_ID;
-            } catch (Exception e) {
-                e.printStackTrace();
-                log.error(e.getMessage());
-                result = ResultConfig.UNKNOWN_ERROR;
-            }
-
-            log.info("insert memo, userId : " + userId + ", content : " + content + ", result : " + result);
-
-            MemoInsertResultModel model = new MemoInsertResultModel();
-            model.setResult(result);
-            return model;
+        public ActionExecutable getActionExecutor() {
+            return new InsertActionExecutor();
         }
     }, UPDATE {
         @Override
-        public ApiResultModel doAction(MemoDao memoDao, ElasticsearchRepository elasticsearchRepository, String userId, int memoId, String content, Integer start, Integer limit, String time) {
-            if (memoId == -1 || TextUtils.isEmpty(content)) {
-                MemoUpdateResultModel model = new MemoUpdateResultModel();
-                model.setResult(ResultConfig.INVALID_PARAMETER);
-                return model;
-            }
-
-            String result = ResultConfig.SUCCESS;
-            try {
-                if (userId.equals(memoDao.getUserId(memoId))) {
-                    memoDao.update(memoId, content, TimeFormatUtils.getCurrentTime());
-
-                    elasticsearchRepository.putMemo(memoId, userId, content);
-                } else {
-                    result = ResultConfig.WRONG_APPROACH;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                result = ResultConfig.UNKNOWN_ERROR;
-            }
-
-            log.info("update memo, memoId : " + memoId + ", content : " + content + ", result : " + result);
-
-            MemoUpdateResultModel model = new MemoUpdateResultModel();
-            model.setResult(result);
-            return model;
+        public ActionExecutable getActionExecutor() {
+            return new UpdateActionExecutor();
         }
     }, DELETE {
         @Override
-        public ApiResultModel doAction(MemoDao memoDao, ElasticsearchRepository elasticsearchRepository, String userId, int memoId, String content, Integer start, Integer limit, String time) {
-            if (memoId == -1) {
-                MemoDeleteResultModel model = new MemoDeleteResultModel();
-                model.setResult(ResultConfig.INVALID_PARAMETER);
-                return model;
-            }
-
-            String result = ResultConfig.SUCCESS;
-            try {
-                if (userId.equals(memoDao.getUserId(memoId))) {
-                    memoDao.delete(memoId);
-
-                    elasticsearchRepository.deleteMemo(memoId, userId);
-                } else {
-                    result = ResultConfig.WRONG_APPROACH;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                result = ResultConfig.UNKNOWN_ERROR;
-            }
-
-            log.info("delete memo, memoId : " + memoId + ", result : " + result);
-
-            MemoDeleteResultModel model = new MemoDeleteResultModel();
-            model.setResult(result);
-            return model;
+        public ActionExecutable getActionExecutor() {
+            return new DeleteActionExecutor();
         }
     }, SELECT {
         @Override
-        public ApiResultModel doAction(MemoDao memoDao, ElasticsearchRepository elasticsearchRepository, String userId, int memoId, String content, Integer start, Integer limit, String time) {
-            if (start == null || limit == null) {
-                MemoSelectResultModel model = new MemoSelectResultModel();
-                model.setResult(ResultConfig.INVALID_PARAMETER);
-                return model;
-            }
-
-            int startIndex = start;
-            int limitIndex = limit;
-
-            List<MemoModel> memoModels = null;
-            String result = ResultConfig.SUCCESS;
-
-            if (TextUtils.isEmpty(time)) {
-                time = TimeFormatUtils.getCurrentTime();
-            }
-
-            int totalLength = 0;
-            try {
-                if (TextUtils.isEmpty(userId)) {
-                    memoModels = memoDao.select(startIndex, limitIndex, time);
-                } else {
-                    memoModels = memoDao.selectWithUserId(userId, startIndex, limitIndex, time);
-                }
-
-                totalLength = memoDao.totalLength(userId, time);
-            } catch (Exception e) {
-                e.printStackTrace();
-                result = ResultConfig.UNKNOWN_ERROR;
-            }
-
-            MemoSelectResultModel model = new MemoSelectResultModel();
-            model.setMemoList(memoModels);
-            model.setTotalLength(totalLength);
-            model.setResult(result);
-            return model;
+        public ActionExecutable getActionExecutor() {
+            return new SelectActionExecutor();
         }
     }, SEARCH {
         @Override
-        public ApiResultModel doAction(MemoDao memoDao, ElasticsearchRepository elasticsearchRepository, String userId, int memoId, String content, Integer start, Integer limit, String time) {
-            if (TextUtils.isEmpty(content)) {
-                MemoSelectResultModel model = new MemoSelectResultModel();
-                model.setResult(ResultConfig.INVALID_PARAMETER);
-                return model;
-            }
-
-            String result = ResultConfig.SUCCESS;
-            List<MemoModel> models = null;
-            try {
-                List<String> ids = elasticsearchRepository.searchMemo(userId, content);
-                if (ids != null && ids.size() > 0) {
-                    models = memoDao.selectWithIds(ids);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                result = ResultConfig.UNKNOWN_ERROR;
-            }
-
-            MemoSelectResultModel model = new MemoSelectResultModel();
-            model.setResult(result);
-            model.setMemoList(models);
-            model.setTotalLength(models.size());
-            return model;
+        public ActionExecutable getActionExecutor() {
+            return new SearchActionExecutor();
         }
     };
 
@@ -184,14 +39,5 @@ public enum ActionType {
         return actionType;
     }
 
-    public abstract ApiResultModel doAction(MemoDao memoDao,
-                                            ElasticsearchRepository elasticsearchRepository,
-                                            String userId,
-                                            int memoId,
-                                            String content,
-                                            Integer start,
-                                            Integer limit,
-                                            String time);
-
-    public Logger log = Logger.getLogger(this.getClass());
+    public abstract ActionExecutable getActionExecutor();
 }

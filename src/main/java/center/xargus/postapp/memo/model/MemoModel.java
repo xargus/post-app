@@ -3,6 +3,7 @@ package center.xargus.postapp.memo.model;
 public class MemoModel {
     private int _id;
     private String user_id;
+    private String title;
     private String content;
     private String updateDate;
 
@@ -36,5 +37,13 @@ public class MemoModel {
 
     public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

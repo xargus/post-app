@@ -46,6 +46,7 @@ public class MemoController {
     @ResponseBody
     public Callable<String> memo(@RequestParam(value = "action") final String action,
                                 @RequestParam(value = "memoId", required = false) final Integer memoId,
+                                 @RequestParam(value = "title", required = false) final String title,
                                 @RequestParam(value = "content", required = false) final String content,
                                 @RequestParam(value = "start", required = false) final Integer start,
                                 @RequestParam(value = "limit", required = false) final Integer limit,
@@ -76,7 +77,10 @@ public class MemoController {
 
                 log.info("action : " + action + ", type : " + ActionType.getType(action.toUpperCase()) + ", userId : " + userId);
 
-                ApiResultModel model = ActionType.getType(action.toUpperCase()).doAction(sqlSession.getMapper(MemoDao.class), elasticsearchRepository, userId, id, content, start, limit, time);
+                ApiResultModel model = ActionType
+                        .getType(action.toUpperCase())
+                        .getActionExecutor()
+                        .execute(sqlSession.getMapper(MemoDao.class), elasticsearchRepository, userId, id, title, content, start, limit, time);
                 return new Gson().toJson(model);
             }
         };
