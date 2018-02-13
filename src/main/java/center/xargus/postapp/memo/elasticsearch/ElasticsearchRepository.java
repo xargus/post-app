@@ -51,7 +51,7 @@ public class ElasticsearchRepository {
 
     public List<String> searchMemo(String userId, String keyword) throws IOException {
         Request request = new Request.Builder()
-                .url(URL + "/memo/" + userId + "/_search?q=content:*"+keyword+"*")
+                .url(URL + "/memo/" + userId + "/_search?q=content:*"+keyword+"*" + "&q=" + "title:*" + keyword + "*")
                 .build();
 
         Response response = client.newCall(request).execute();

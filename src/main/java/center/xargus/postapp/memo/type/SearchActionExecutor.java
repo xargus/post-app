@@ -9,6 +9,7 @@ import center.xargus.postapp.model.ApiResultModel;
 import center.xargus.postapp.utils.TextUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchActionExecutor implements ActionExecutable {
@@ -21,7 +22,7 @@ public class SearchActionExecutor implements ActionExecutable {
         }
 
         String result = ResultConfig.SUCCESS;
-        List<MemoModel> models = null;
+        List<MemoModel> models = new ArrayList<>();
         try {
             List<String> ids = elasticsearchRepository.searchMemo(userId, content);
             if (ids != null && ids.size() > 0) {
