@@ -23,6 +23,10 @@
         <![CDATA[select * from MEMO where user_id = #{user_id} AND updateDate < #{time} ORDER BY updateDate DESC limit #{start}, #{limit}]]>
     </select>
 
+    <select id="selectWithId" parameterType="int" resultType="center.xargus.postapp.memo.model.MemoModel">
+        select * from MEMO where _id = #{_id}
+    </select>
+
     <select id="selectWithIds" parameterType="java.util.List" resultType="center.xargus.postapp.memo.model.MemoModel">
         select * from MEMO where
         <foreach collection="ids" item="id" separator="or">

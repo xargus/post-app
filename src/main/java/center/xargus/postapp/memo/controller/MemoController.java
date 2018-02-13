@@ -75,7 +75,7 @@ public class MemoController {
                     id = memoId;
                 }
 
-                log.info("action : " + action + ", type : " + ActionType.getType(action.toUpperCase()) + ", userId : " + userId);
+                log.info("action : " + action + ", type : " + ActionType.getType(action.toUpperCase()) + ", userId : " + userId + ", memoId : " + memoId);
 
                 ApiResultModel model = ActionType
                         .getType(action.toUpperCase())

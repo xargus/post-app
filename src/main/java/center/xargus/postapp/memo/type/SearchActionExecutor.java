@@ -4,7 +4,7 @@ import center.xargus.postapp.constants.ResultConfig;
 import center.xargus.postapp.memo.dao.MemoDao;
 import center.xargus.postapp.memo.elasticsearch.ElasticsearchRepository;
 import center.xargus.postapp.memo.model.MemoModel;
-import center.xargus.postapp.memo.model.MemoSelectResultModel;
+import center.xargus.postapp.memo.model.MemoListSelectResultModel;
 import center.xargus.postapp.model.ApiResultModel;
 import center.xargus.postapp.utils.TextUtils;
 
@@ -16,7 +16,7 @@ public class SearchActionExecutor implements ActionExecutable {
     @Override
     public ApiResultModel execute(MemoDao memoDao, ElasticsearchRepository elasticsearchRepository, String userId, int memoId, String title, String content, Integer start, Integer limit, String time) {
         if (TextUtils.isEmpty(content)) {
-            MemoSelectResultModel model = new MemoSelectResultModel();
+            MemoListSelectResultModel model = new MemoListSelectResultModel();
             model.setResult(ResultConfig.INVALID_PARAMETER);
             return model;
         }
@@ -33,7 +33,7 @@ public class SearchActionExecutor implements ActionExecutable {
             result = ResultConfig.UNKNOWN_ERROR;
         }
 
-        MemoSelectResultModel model = new MemoSelectResultModel();
+        MemoListSelectResultModel model = new MemoListSelectResultModel();
         model.setResult(result);
         model.setMemoList(models);
         model.setTotalLength(models.size());
